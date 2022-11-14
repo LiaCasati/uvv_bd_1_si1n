@@ -1,32 +1,3 @@
---criando usuario--
-CREATE ROLE teste WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	INHERIT
-	LOGIN
-	REPLICATION
-	BYPASSRLS
-	PASSWORD '1234';
-
---criando o banco de dados uvv--
-CREATE DATABASE "uvv"
-  WITH OWNER = lia
-       ENCODING = 'UTF8'
-       TEMPLATE = template0
-       LC_COLLATE = 'Portuguese_Brazil.1252'
-       LC_CTYPE = 'Portuguese_Brazil.1252'
-       ALLOW_CONNECTIONS = true
-       TABLESPACE = pg_default
-	     IS_TEMPLATE = False;
-
-
---criando schema hr
-CREATE SCHEMA hr AUTHORIZATION lia;
-
---tornando hr o schema principal
-ALTER USER lia
-SET SEARCH_PATH TO hr, "$user", public;
 /*
 ---------------------------------------
 |         CRIANDO AS TABELAS           |
@@ -261,32 +232,4 @@ VALUES  ( 1, 'Europe' ),
 	 	( 2, 'Americas'),
     ( 3 , 'Asia' ),
 		( 4 , 'Middle East and Africa' );
-
---Populando a tabela países--
-INSERT INTO paises(id_pais, nome, id_regiao) 
-VALUES  ( 'IT', 'Italy', 1 ), 
-        ( 'JP', 'Japan', 3),
-        ( 'US', 'United States of America', 2 ), 
-        ( 'CA', 'Canada', 2 ), 
-        ( 'CN', 'China', 3 ), 
-        ( 'IN', 'India', 3), 
-        ( 'AU', 'Australia', 3 ), 
-        ( 'ZW', 'Zimbabwe', 4), 
-        ( 'SG', 'Singapore', 3 ),
-        ( 'UK', 'United Kingdom', 1  ), 
-        ( 'FR', 'France', 1),
-        ( 'DE', 'Germany', 1 ),
-        ( 'ZM', 'Zambia', 4 ), 
-        ( 'EG', 'Egypt', 4), 
-        ( 'BR', 'Brazil', 2 ),
-        ( 'CH', 'Switzerland', 1 ),
-        ( 'NL', 'Netherlands', 1 ),
-        ( 'MX', 'Mexico', 2 ), 
-        ( 'KW' , 'Kuwait', 4), 
-        ( 'IL', 'Israel', 4),
-        ( 'DK', 'Denmark', 1 ),
-        ( 'ML', 'Malaysia', 3 ), 
-        ( 'NG', 'Nigeria', 4 ),
-        ( 'AR', 'Argentina', 2 ), 
-        ( 'BE', 'Belgium', 1 );
 
