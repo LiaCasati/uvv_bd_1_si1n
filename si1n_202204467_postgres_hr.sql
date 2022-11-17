@@ -27,8 +27,7 @@ CREATE DATABASE "uvv"
 	     IS_TEMPLATE = False;
 
 --Logando no banco de dados--
-SET SEARCH_PATH TO uvv;
--- \c "dbname = uvv user = lia password = 1234"
+\c "dbname = uvv user = lia password = 1234"
 
 --criando schema hr
 CREATE SCHEMA hr AUTHORIZATION lia;

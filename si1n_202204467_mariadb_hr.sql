@@ -1,10 +1,10 @@
-#Deletando banco de dados caso exista#
+#Deletando banco de dados caso exista
 DROP DATABASE IF EXISTS uvv;
 
-#Deletando usuario caso exista#
+#Deletando usuario caso exista
 DROP USER IF EXISTS lia;
 
-#criando usuario#
+#criando usuario
 CREATE USER lia WITH 
 	SUPERUSER
 	CREATEDB
@@ -15,7 +15,7 @@ CREATE USER lia WITH
 	BYPASSRLS
 	PASSWORD '1234';
 
-#criando o banco de dados uvv#
+#criando o banco de dados uvv
 CREATE DATABASE "uvv"
   WITH OWNER = lia
        ENCODING = 'UTF8'
@@ -26,7 +26,7 @@ CREATE DATABASE "uvv"
        TABLESPACE = pg_default
 	     IS_TEMPLATE = False;
 
-#Logando no banco de dados#
+#Logando no banco de dados
 \c "dbname = uvv user = lia password = 1234"
 
 #criando schema hr
@@ -36,242 +36,233 @@ CREATE SCHEMA hr AUTHORIZATION lia;
 ALTER USER lia
 SET SEARCH_PATH TO hr, "$user", public;
 /*
-###################-
+----------------------------------------
 |         CRIANDO AS TABELAS           |
-###################-
+----------------------------------------
 */
 
-#Criando a tabela regiões#
-CREATE TABLE hr.regioes (
-                id_regiao INTEGER NOT NULL,
+#Criando a tabela regiões
+CREATE TABLE regioes (
+                id_regiao INT NOT NULL,
                 nome VARCHAR(25) NOT NULL,
-                CONSTRAINT id_regiao PRIMARY KEY (id_regiao)
+                PRIMARY KEY (id_regiao)
 );
-COMMENT ON TABLE hr.regioes IS 'Tabela de regiões. Inclui os identificadores e os nomes das regiões';
-COMMENT ON COLUMN hr.regioes.id_regiao IS 'Identificador da tabela regiões.';
-COMMENT ON COLUMN hr.regioes.nome IS 'Refere-se ao nome da região';
+
+ALTER TABLE regioes COMMENT 'Tabela de regiões. Inclui os identificadores e os nomes das regiões';
+ALTER TABLE regioes MODIFY COLUMN id_regiao INTEGER COMMENT 'Identificador da tabela regiões.';
+ALTER TABLE regioes MODIFY COLUMN nome VARCHAR(25) COMMENT 'Refere-se ao nome da região';
 
 
 CREATE UNIQUE INDEX nome
- ON hr.regioes
+ ON regioes
  ( nome );
 
 
-#Criando a tabela países#
-CREATE TABLE hr.paises (
+#Criando a tabela países
+CREATE TABLE paises (
                 id_pais CHAR(2) NOT NULL,
                 nome VARCHAR(50) NOT NULL,
-                id_regiao INTEGER NOT NULL,
-                CONSTRAINT id_pais PRIMARY KEY (id_pais)
+                id_regiao INT NOT NULL,
+                PRIMARY KEY (id_pais)
 );
-COMMENT ON TABLE hr.paises. IS "Tabela com as localizacões das empresas."
-COMMENT ON COLUMN hr.paises.id_pais IS 'Identificador de países.';
-COMMENT ON COLUMN hr.paises.nome IS 'Nome do país em que a empresa se localiza.';
-COMMENT ON COLUMN hr.paises.id_regiao IS 'Chave estrangeira para a tabela regiões.';
+
+ALTER TABLE paises COMMENT 'Tabela com os países.';
+ALTER TABLE paises MODIFY COLUMN id_pais CHAR(2) COMMENT 'Identificador de países.';
+ALTER TABLE paises MODIFY COLUMN nome VARCHAR(50) COMMENT 'Nome do país em que a empresa se localiza.';
+ALTER TABLE paises MODIFY COLUMN id_regiao INTEGER COMMENT 'Chave estrangeira para a tabela regiões.';
 
 
-CREATE UNIQUE INDEX nome_pais
- ON hr.paises  
+CREATE UNIQUE INDEX nome_pais USING CTXCAT
+ ON paises
  ( nome );
 
 
-#Criando a tabela localizações#
-CREATE TABLE hr.localizacoes (
-                id_localizacao INTEGER NOT NULL,
+
+#Criando a tabela localizações
+CREATE TABLE localizacoes (
+                id_localizacao INT NOT NULL,
                 endereco VARCHAR(50),
                 cep VARCHAR(12),
                 cidade VARCHAR(50),
                 uf VARCHAR(25),
                 id_pais CHAR(2) NOT NULL,
-                CONSTRAINT id_localizacao PRIMARY KEY (id_localizacao)
+                PRIMARY KEY (id_localizacao)
 );
-COMMENT ON COLUMN hr.localizacoes.id_localizacao IS 'Identificador da tabela localizacoes';
-COMMENT ON COLUMN hr.localizacoes.endereco IS 'Endereço de uma empresa.';
-COMMENT ON COLUMN hr.localizacoes.cep IS 'CEP da localização da empresa.';
-COMMENT ON COLUMN hr.localizacoes.cidade IS 'Cidade em que a empresa se localiza.';
-COMMENT ON COLUMN hr.localizacoes.uf IS 'Estado em que a empresa se localiza.';
-COMMENT ON COLUMN hr.localizacoes.id_pais IS 'Chave estrangeira para a tabela países.';
+
+ALTER TABLE localizacoes COMMENT 'Tabela com as localizacões das empresas.';
+ALTER TABLE localizacoes MODIFY COLUMN id_localizacao INTEGER COMMENT 'Identificador da tabela localizacoes';
+ALTER TABLE localizacoes MODIFY COLUMN endereco VARCHAR(50) COMMENT 'Endereço de uma empresa.';
+ALTER TABLE localizacoes MODIFY COLUMN cep VARCHAR(12) COMMENT 'CEP da localização da empresa.';
+ALTER TABLE localizacoes MODIFY COLUMN cidade VARCHAR(50) COMMENT 'Cidade em que a empresa se localiza.';
+ALTER TABLE localizacoes MODIFY COLUMN uf VARCHAR(25) COMMENT 'Estado em que a empresa se localiza.';
+ALTER TABLE localizacoes MODIFY COLUMN id_pais CHAR(2) COMMENT 'Chave estrangeira para a tabela países.';
 
 
-#Criando a tabela departamentos#
-CREATE TABLE hr.departamentos (
-                id_departamento INTEGER NOT NULL,
+#Criando a tabela departamentos
+CREATE TABLE departamentos (
+                id_departamento INT NOT NULL,
                 nome VARCHAR(50) NOT NULL,
-                id_localizacao INTEGER NOT NULL,
-                CONSTRAINT id_departamento PRIMARY KEY (id_departamento)
+                id_localizacao INT NOT NULL,
+                PRIMARY KEY (id_departamento)
 );
-COMMENT ON TABLE hr.departamentos IS 'Tabela que contem os departamentos de determinada empresa.';
-COMMENT ON COLUMN hr.departamentos.id_departamento IS 'Identificador da tabela departamentos.';
-COMMENT ON COLUMN hr.departamentos.nome IS 'Nome do departamento da empresa.';
-COMMENT ON COLUMN hr.departamentos.id_localizacao IS 'Chave estrangeira para a tabela localizações.';
+
+ALTER TABLE departamentos COMMENT 'Tabela que contem os departamentos de determinada empresa.';
+ALTER TABLE departamentos MODIFY COLUMN id_departamento INTEGER COMMENT 'Identificador da tabela departamentos.';
+ALTER TABLE departamentos MODIFY COLUMN nome VARCHAR(50) COMMENT 'Nome do departamento da empresa.';
+ALTER TABLE departamentos MODIFY COLUMN id_localizacao INTEGER COMMENT 'Chave estrangeira para a tabela localizações.';
 
 
-CREATE UNIQUE INDEX nome_deparatamento
- ON hr.departamentos  
+CREATE UNIQUE INDEX nome_deparatamento USING CTXCAT
+ ON departamentos
  ( nome );
 
 
- #Criando a tabela empregados#
-CREATE TABLE hr.empregados (
-                id_empregado INTEGER NOT NULL,
+ #Criando a tabela empregados
+CREATE TABLE empregados (
+                id_empregado INT NOT NULL,
                 nome VARCHAR(75) NOT NULL,
                 email VARCHAR(35) NOT NULL,
                 data_contratacao DATE NOT NULL,
-                salario NUMERIC(8,2),
-                comissao NUMERIC(4,2),
+                salario DECIMAL(8,2),
+                comissao DECIMAL(4,2),
                 telefone VARCHAR(20),
-                id_gerente INTEGER NOT NULL,
+                id_gerente INT,
                 id_cargo VARCHAR(10) NOT NULL,
-                id_departamento INTEGER NOT NULL,
-                CONSTRAINT id_empregado PRIMARY KEY (id_empregado)
+                id_departamento INT,
+                PRIMARY KEY (id_empregado)
 );
-COMMENT ON TABLE hr.empregados IS 'Tabela que contem as informações dos empregados da empresa.';
-COMMENT ON COLUMN hr.empregados.id_empregado IS 'Identificador da tabela empregados.';
-COMMENT ON COLUMN hr.empregados.nome IS 'Nome do empregado.';
-COMMENT ON COLUMN hr.empregados.email IS 'Email do empregado.';
-COMMENT ON COLUMN hr.empregados.data_contratacao IS 'Data de contratação do empregado';
-COMMENT ON COLUMN hr.empregados.salario IS 'Salario do empregado.';
-COMMENT ON COLUMN hr.empregados.comissao IS 'Comissão do empregado.';
-COMMENT ON COLUMN hr.empregados.telefone IS 'Telefone do empregado.';
-COMMENT ON COLUMN hr.empregados.id_gerente IS 'Chave estrangeira responsável pelo autorelacionamento da tabela empregados';
-COMMENT ON COLUMN hr.empregados.id_cargo IS 'Chave estrangeira para a tabela cargos.';
-COMMENT ON COLUMN hr.empregados.id_departamento IS 'Identificador da tabela departamentos.';
+
+ALTER TABLE empregados COMMENT 'Tabela que contem as informações dos empregados da empresa.';
+ALTER TABLE empregados MODIFY COLUMN id_empregado INTEGER COMMENT 'Identificador da tabela empregados.';
+ALTER TABLE empregados MODIFY COLUMN nome VARCHAR(75) COMMENT 'Nome do empregado.';
+ALTER TABLE empregados MODIFY COLUMN email VARCHAR(35) COMMENT 'Email do empregado.';
+ALTER TABLE empregados MODIFY COLUMN data_contratacao DATE COMMENT 'Data de contratação do empregado';
+ALTER TABLE empregados MODIFY COLUMN salario DECIMAL(8, 2) COMMENT 'Salario do empregado.';
+ALTER TABLE empregados MODIFY COLUMN comissao DECIMAL(4, 2) COMMENT 'Comissão do empregado.';
+ALTER TABLE empregados MODIFY COLUMN telefone VARCHAR(20) COMMENT 'Telefone do empregado.';
+ALTER TABLE empregados MODIFY COLUMN id_gerente INTEGER COMMENT 'Chave estrangeira responsável pelo autorelacionamento da tabela empregados';
+ALTER TABLE empregados MODIFY COLUMN id_cargo VARCHAR(10) COMMENT 'Chave estrangeira para a tabela cargos.';
+ALTER TABLE empregados MODIFY COLUMN id_departamento INTEGER COMMENT 'Identificador da tabela departamentos.';
 
 
-CREATE UNIQUE INDEX email
- ON hr.empregados  
+CREATE UNIQUE INDEX email USING CTXCAT
+ ON empregados
  ( email );
 
 
-#Criando a tabela cargos#
-CREATE TABLE hr.cargos (
+#Criando a tabela cargos
+CREATE TABLE cargos (
                 id_cargo VARCHAR(10) NOT NULL,
                 cargo VARCHAR(35) NOT NULL,
-                salario_minimo NUMERIC(8,2),
-                salario_maximo NUMERIC(8,2),
-                CONSTRAINT cargos_pk PRIMARY KEY (id_cargo)
+                salario_minimo DECIMAL(8,2),
+                salario_maximo DECIMAL(8,2),
+                PRIMARY KEY (id_cargo)
 );
-COMMENT ON TABLE hr.cargos IS 'Tabela com o cargo atual do empregado.';
-COMMENT ON COLUMN hr.cargos.id_cargo IS 'Identificador da tabela cargos.';
-COMMENT ON COLUMN hr.cargos.cargo IS 'Cargo atual do empregado.';
-COMMENT ON COLUMN hr.cargos.salario_minimo IS 'Salario minimo do cargo.';
-COMMENT ON COLUMN hr.cargos.salario_maximo IS 'Salario maximo do cargo';
+
+ALTER TABLE cargos COMMENT 'Tabela com o cargo atual do empregado.';
+ALTER TABLE cargos MODIFY COLUMN id_cargo VARCHAR(10) COMMENT 'Identificador da tabela cargos.';
+ALTER TABLE cargos MODIFY COLUMN cargo VARCHAR(35) COMMENT 'Cargo atual do empregado.';
+ALTER TABLE cargos MODIFY COLUMN salario_minimo DECIMAL(8, 2) COMMENT 'Salario minimo do cargo.';
+ALTER TABLE cargos MODIFY COLUMN salario_maximo DECIMAL(8, 2) COMMENT 'Salario maximo do cargo';
 
 
-CREATE UNIQUE INDEX cargo
- ON hr.cargos  
+CREATE UNIQUE INDEX cargo USING CTXCAT
+ ON cargos
  ( cargo );
 
 
-#Criando a tabela historico de cargos#
-CREATE TABLE hr.historico_cargos (
+#Criando a tabela historico de cargos
+CREATE TABLE historico_cargos (
                 data_inicial DATE NOT NULL,
-                id_empregado INTEGER NOT NULL,
+                id_empregado INT NOT NULL,
                 data_final DATE NOT NULL,
                 id_cargo VARCHAR(10) NOT NULL,
-                id_departamento INTEGER NOT NULL,
-                CONSTRAINT historico_cargos_pk PRIMARY KEY (data_inicial, id_empregado)
+                id_departamento INT NOT NULL,
+                PRIMARY KEY (data_inicial, id_empregado)
 );
-COMMENT ON TABLE hr.historico_cargos IS 'Tabela com informações do historico de cargos de um empregado.';
-COMMENT ON COLUMN hr.historico_cargos.data_inicial IS 'Parte da chave primaria. Contem a data inicial do empregado em um cargo.';
-COMMENT ON COLUMN hr.historico_cargos.id_empregado IS 'Parte da chave primaria da tabela historico_cargos e chave estrangeira para empregados';
-COMMENT ON COLUMN hr.historico_cargos.data_final IS 'Data final do empregado neste cargo.';
-COMMENT ON COLUMN hr.historico_cargos.id_cargo IS 'Chave estrangeira para a tabela cargos.';
-COMMENT ON COLUMN hr.historico_cargos.id_departamento IS 'Identificador da tabela departamentos.';
+
+ALTER TABLE historico_cargos COMMENT 'Tabela com informações do historico de cargos de um empregado.';
+ALTER TABLE historico_cargos MODIFY COLUMN data_inicial DATE COMMENT 'Parte da chave primaria. Contem a data inicial do empregado em um cargo.';
+ALTER TABLE historico_cargos MODIFY COLUMN id_empregado INTEGER COMMENT 'Parte da chave primaria da tabela historico_cargos e chave estrangeira para empregados';
+ALTER TABLE historico_cargos MODIFY COLUMN data_final DATE COMMENT 'Data final do empregado neste cargo.';
+ALTER TABLE historico_cargos MODIFY COLUMN id_cargo VARCHAR(10) COMMENT 'Chave estrangeira para a tabela cargos.';
+ALTER TABLE historico_cargos MODIFY COLUMN id_departamento INTEGER COMMENT 'Identificador da tabela departamentos.';
 
 /*
-###################-
+----------------------------------------
 |      RELACIONANDO AS TABELAS         |
-###################-
+----------------------------------------
 */
 
-#Relacionando historico_cargos com cargos#
-ALTER TABLE hr.historico_cargos ADD CONSTRAINT cargos_historico_cargos_fk
+ALTER TABLE historico_cargos ADD CONSTRAINT cargos_historico_cargos_fk
 FOREIGN KEY (id_cargo)
-REFERENCES hr.cargos (id_cargo)
+REFERENCES cargos (id_cargo)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando empregados com cargos#
-ALTER TABLE hr.empregados ADD CONSTRAINT cargos_empregados_fk
+ALTER TABLE empregados ADD CONSTRAINT cargos_empregados_fk
 FOREIGN KEY (id_cargo)
-REFERENCES hr.cargos (id_cargo)
+REFERENCES cargos (id_cargo)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando paises com regioes#
-ALTER TABLE hr.paises ADD CONSTRAINT regioes_paises_fk
+ALTER TABLE paises ADD CONSTRAINT regioes_paises_fk
 FOREIGN KEY (id_regiao)
-REFERENCES hr.regioes (id_regiao)
+REFERENCES regioes (id_regiao)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando localizações com países#
-ALTER TABLE hr.localizacoes ADD CONSTRAINT paises_localizacoes_fk
+ALTER TABLE localizacoes ADD CONSTRAINT paises_localizacoes_fk
 FOREIGN KEY (id_pais)
-REFERENCES hr.paises (id_pais)
+REFERENCES paises (id_pais)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando departamentos com localizações#
-ALTER TABLE hr.departamentos ADD CONSTRAINT localizacoes_departamentos_fk
+ALTER TABLE departamentos ADD CONSTRAINT localizacoes_departamentos_fk
 FOREIGN KEY (id_localizacao)
-REFERENCES hr.localizacoes (id_localizacao)
+REFERENCES localizacoes (id_localizacao)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando empregados com departamentos#
-ALTER TABLE hr.empregados ADD CONSTRAINT departamentos_empregados_fk
+ALTER TABLE empregados ADD CONSTRAINT departamentos_empregados_fk
 FOREIGN KEY (id_departamento)
-REFERENCES hr.departamentos (id_departamento)
+REFERENCES departamentos (id_departamento)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando hitorico_cargos com departamentos#
-ALTER TABLE hr.historico_cargos ADD CONSTRAINT departamentos_historico_cargos_fk
+ALTER TABLE historico_cargos ADD CONSTRAINT departamentos_historico_cargos_fk
 FOREIGN KEY (id_departamento)
-REFERENCES hr.departamentos (id_departamento)
+REFERENCES departamentos (id_departamento)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Relacionando hitorico_cargos com empregados#
-ALTER TABLE hr.historico_cargos ADD CONSTRAINT empregados_historico_cargos_fk
+ALTER TABLE historico_cargos ADD CONSTRAINT empregados_historico_cargos_fk
 FOREIGN KEY (id_empregado)
-REFERENCES hr.empregados (id_empregado)
+REFERENCES empregados (id_empregado)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
-#Autorelacionamento da tabela empregados#
-ALTER TABLE hr.empregados ADD CONSTRAINT empregados_empregados_fk
+ALTER TABLE empregados ADD CONSTRAINT empregados_empregados_fk
 FOREIGN KEY (id_gerente)
-REFERENCES hr.empregados (id_empregado)
+REFERENCES empregados (id_empregado)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
+ON UPDATE NO ACTION;
 
 /*
-###################-
+--------------------------------------
 |       POPULANDO AS TABELAS          |
-###################-
+--------------------------------------
 */
 
-#Populando a tabela regioes#
-INSERT INTO regioes(id_regiao, nome) 
+#Populando a tabela regioes
+INSERT INTO hr.regioes (id_regiao, nome) 
 VALUES  ( 1, 'Europe' ), 
 	 	( 2, 'Americas'),
     ( 3 , 'Asia' ),
 		( 4 , 'Middle East and Africa' );
 
-#Populando a tabela países#
-INSERT INTO paises(id_pais, nome, id_regiao) 
+#Populando a tabela países
+INSERT INTO hr.paises (id_pais, nome, id_regiao) 
 VALUES  ( 'IT', 'Italy', 1 ), 
         ( 'JP', 'Japan', 3),
         ( 'US', 'United States of America', 2 ), 
@@ -299,8 +290,8 @@ VALUES  ( 'IT', 'Italy', 1 ),
         ( 'BE', 'Belgium', 1 );
 
 
-#Populando a tabela localizacoes#
-INSERT INTO localizacoes(id_localizacao, endereco, cep, cidade, uf, id_pais) VALUES 
+#Populando a tabela localizacoes
+INSERT INTO hr.localizacoes (id_localizacao, endereco, cep, cidade, uf, id_pais) VALUES 
         ( 1000, '1297 Via Cola di Rie' , '00989', 'Roma', NULL, 'IT'),
         ( 1100 , '93091 Calle della Testa', '10934', 'Venice', NULL, 'IT'),
         ( 1200 , '2017 Shinjuku-ku', '1689', 'Tokyo', 'Tokyo Prefecture', 'JP'),
@@ -325,8 +316,8 @@ INSERT INTO localizacoes(id_localizacao, endereco, cep, cidade, uf, id_pais) VAL
         ( 3100, 'Pieter Breughelstraat 837', '3029SK', 'Utrecht', 'Utrecht', 'NL'),
         ( 3200, 'Mariano Escobedo 9991', '11932', 'Mexico City', 'Distrito Federal', 'MX');
 
-#Populando a tabela departamentos#
-INSERT INTO departamentos(id_departamento, nome, id_localizacao)  VALUES 
+#Populando a tabela departamentos
+INSERT INTO hr.departamentos (id_departamento, nome, id_localizacao)  VALUES 
         ( 10, 'Administration', 1700),
         ( 20, 'Marketing', 1800),
         ( 30, 'Purchasing', 1700),
@@ -355,8 +346,8 @@ INSERT INTO departamentos(id_departamento, nome, id_localizacao)  VALUES
 		    ( 260, 'Recruiting', 1700),
      	  ( 270, 'Payroll', 1700);
 
-#Populando a tabela cargos#
-INSERT INTO cargos(id_cargo, cargo, salario_minimo, salario_maximo) VALUES 
+#Populando a tabela cargos
+INSERT INTO hr.cargos (id_cargo, cargo, salario_minimo, salario_maximo) VALUES 
         ( 'AD_PRES', 'President', 20080, 40000),
         ( 'AD_VP', 'Administration Vice President', 15000, 30000),
         ( 'AD_ASST', 'Administration Assistant', 3000, 6000),
@@ -377,8 +368,8 @@ INSERT INTO cargos(id_cargo, cargo, salario_minimo, salario_maximo) VALUES
         ( 'HR_REP', 'Human Resources Representative', 4000, 9000),
         ( 'PR_REP', 'Public Relations Representative', 4500, 10500);
 
-#Populando a tabela empregados#
-INSERT INTO empregados(id_empregado, nome, email, telefone, data_contratacao, id_cargo, salario, comissao, id_gerente, id_departamento) VALUES 
+#Populando a tabela empregados
+INSERT INTO hr.empregados (id_empregado, nome, email, telefone, data_contratacao, id_cargo, salario, comissao, id_gerente, id_departamento) VALUES 
         ( 100, 'Steven King', 'SKING', '515.123.4567', TO_DATE('17-06-2003', 'dd-MM-yyyy'), 'AD_PRES', 24000, NULL, NULL, 90), 
         ( 101, 'Neena Kochhar', 'NKOCHHAR', '515.123.4568', TO_DATE('21-09-2005', 'dd-MM-yyyy'), 'AD_VP', 17000, NULL, 100, 90), 
         ( 102, 'Lex De Haan', 'LDEHAAN', '515.123.4569', TO_DATE('13-01-2001', 'dd-MM-yyyy'), 'AD_VP', 17000, NULL, 100, 90), 
@@ -487,8 +478,8 @@ INSERT INTO empregados(id_empregado, nome, email, telefone, data_contratacao, id
         ( 205, 'Shelley Higgins', 'SHIGGINS', '515.123.8080', TO_DATE('07-06-2002', 'dd-MM-yyyy'), 'AC_MGR', 12008, NULL, 101, 110),
         ( 206, 'William Gietz', 'WGIETZ', '515.123.8181', TO_DATE('07-06-2002', 'dd-MM-yyyy'), 'AC_ACCOUNT', 8300, NULL, 205, 110);
 
-#Populando a tabela historico_cargos#    
-INSERT INTO historico_cargos (id_empregado, data_inicial, data_final, id_cargo , id_departamento )
+#Populando a tabela historico_cargos  
+INSERT INTO hr.historico_cargos (id_empregado, data_inicial, data_final, id_cargo , id_departamento )
 VALUES (102, TO_DATE('13-01-2001', 'dd-MM-yyyy'), TO_DATE('24-07-2006', 'dd-MM-yyyy'), 'IT_PROG', 60),
 		(101, TO_DATE('21-09-1997', 'dd-MM-yyyy'), TO_DATE('27-10-2001', 'dd-MM-yyyy'), 'AC_ACCOUNT', 110),
 		(101, TO_DATE('28-10-2001', 'dd-MM-yyyy'), TO_DATE('15-03-2005', 'dd-MM-yyyy'), 'AC_MGR', 110),
