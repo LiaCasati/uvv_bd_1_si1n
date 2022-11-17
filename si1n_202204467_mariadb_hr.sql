@@ -1,40 +1,16 @@
-#Deletando banco de dados caso exista
-DROP DATABASE IF EXISTS uvv;
-
-#Deletando usuario caso exista
-DROP USER IF EXISTS lia;
-
-#criando usuario
-CREATE USER lia WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	INHERIT
-	LOGIN
-	REPLICATION
-	BYPASSRLS
-	PASSWORD '1234';
+#criando usuario e garantindo privilegios
+CREATE USER 'lia'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON * . * TO 'lia'@'localhost';
+FLUSH PRIVILEGES;
 
 #criando o banco de dados uvv
-CREATE DATABASE "uvv"
-  WITH OWNER = lia
-       ENCODING = 'UTF8'
-       TEMPLATE = template0
-       LC_COLLATE = 'Portuguese_Brazil.1252'
-       LC_CTYPE = 'Portuguese_Brazil.1252'
-       ALLOW_CONNECTIONS = true
-       TABLESPACE = pg_default
-	     IS_TEMPLATE = False;
+CREATE DATABASE `hr`;
+GRANT ALL ON `hr`.* TO 'lia'@'localhost';
+FLUSH PRIVILEGES;
 
 #Logando no banco de dados
-\c "dbname = uvv user = lia password = 1234"
+USE hr;
 
-#criando schema hr
-CREATE SCHEMA hr AUTHORIZATION lia;
-
-#tornando hr o schema principal
-ALTER USER lia
-SET SEARCH_PATH TO hr, "$user", public;
 /*
 ----------------------------------------
 |         CRIANDO AS TABELAS           |
@@ -48,7 +24,7 @@ CREATE TABLE regioes (
                 PRIMARY KEY (id_regiao)
 );
 
-ALTER TABLE regioes COMMENT 'Tabela de regiões. Inclui os identificadores e os nomes das regiões';
+ALTER TABLE regioes COMMENT 'Tabela de regiões. Inclui os identificadores e os nomes das regiões.';
 ALTER TABLE regioes MODIFY COLUMN id_regiao INTEGER COMMENT 'Identificador da tabela regiões.';
 ALTER TABLE regioes MODIFY COLUMN nome VARCHAR(25) COMMENT 'Refere-se ao nome da região';
 
